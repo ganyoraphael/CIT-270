@@ -6,7 +6,14 @@ const port = 3000;
 
 const bodyParser = require ('body-parser');
 
+const Redis = require ('redis');
+
+const redisClient = Redis.createClient({url:"redis://localhost:6379"});
+
+
+
 const {v4: uuidv4} = require('uuid'); // universely unique identifier
+
 
 app.use(bodyParser.json()); //This looks for incoming data
 
@@ -22,7 +29,7 @@ app.post('/login', (req, res) => {
         const loginToken = uuidv4();
         res.send(loginToken);
 
-        // res.send("Hello");
+    // res.send("Hello");
     } else {
         res.status(401); // unauthorized
         res.send('Incorrect password for '+loginUser);
@@ -30,5 +37,6 @@ app.post('/login', (req, res) => {
 });
 
 app.listen(port, () => {
+    redisClient.connect();
     console.log("listerning");
 });
