@@ -15,12 +15,18 @@ const redisClient = Redis.createClient({url:"redis://localhost:6379"});
 const {v4: uuidv4} = require('uuid'); // universely unique identifier
 
 
-app.use(bodyParser.json()); //This looks for incoming data
+app.use(bodyParser.json()); //activates body-parser to look for incoming data
 
 app.use(express.static('public'));
 
 app.get("/", (req, res) => {
     res.send("Hello Raphael!");
+});
+
+app.get("/validate/:loginToken", async(req, res) =>{
+    const loginToken = req.params.loginToken;
+    const loginUser = await redisClient.hGet('TokenMap',loginToken,loginUser);
+    res.send(loginUser);
 });
 
 app.post('/login', async(req, res) => {
@@ -30,6 +36,8 @@ app.post('/login', async(req, res) => {
     const correctPassword = await redisClient.hGet('UserMap', loginUser);
     if (loginPassword==correctPassword){
         const loginToken = uuidv4();
+        await redisClient.hSet('TokenMap',loginToken,loginUser); // add token to Map (Get correct password from redis)
+        res.cookie('stedicookie', loginToken);
         res.send(loginToken);
 
     // res.send("Hello");
