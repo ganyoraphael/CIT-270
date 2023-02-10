@@ -2,7 +2,7 @@ const express = require ("express");
 
 const app = express();
 
-const port = 3000;
+const port = 443;
 
 const bodyParser = require ('body-parser');
 
@@ -20,6 +20,10 @@ app.use(bodyParser.json()); //activates body-parser to look for incoming data
 
 app.use(express.static('public'));
 const cookieParser = require("cookie-parser");
+const { fromString } = require("uuidv4");
+const https = require('https');
+const fs = require('fs');
+
 app.use(cookieParser());
 
 app.use(async function (req, res, next){
@@ -74,7 +78,19 @@ app.post('/login', async(req, res) => {
     }
 });
 
-app.listen(port, () => {
+//app.listen(port, () => {
+//    redisClient.connect();
+//    console.log("listerning");
+//});
+
+https.createServer(
+    {
+    key: fs.readFileSync('./server.key'),
+    cert: fs.readFileSync('./server.cert'),
+    ca: fs.readFileSync('./chain.pem')
+},
+app
+).listen(port, ()=>{
     redisClient.connect();
-    console.log("listerning");
-});
+    console.log('Listening on port: +port');
+})
