@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cit270raphaelganyoservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cit270raphaelganyoservice
+  template:
+    metadata:
+      name: cit270raphaelganyoservice
+      labels:
+        app: cit270raphaelganyoservice
+    spec:
+      containers:
+        name: cit270raphaelganyoservice
+          image: cit-270-kubernetes
+          volumeMounts:
+            name: ssl
+              mountPath: "/etc/letsencrypt/live/SSL"
+            command: ["npm"]
+            args: ["run", "start"]
+            resources:
+              requests:
+                cpu: 0.125
+                memory: 500Mi
+              limits:
+                cpu: 0.125
+                memory: 600Mi
+            imagePullPolicy: Always
+          volumes:
+            name: ssl
+            secret:
+              secretName: raphaelganyocerts
+              
